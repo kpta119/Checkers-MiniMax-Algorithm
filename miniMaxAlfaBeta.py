@@ -29,17 +29,22 @@ BRIGHT_BOARD_COL = (250,250,250)
 KING_MARK_COL = (255, 215, 0)
 
 
-#count difference between the number of pieces, king+10
-def basic_ev_func(board, is_black_turn):
+def check_if_game_end(board, is_black_turn):
     possible_moves = board.get_possible_moves(is_black_turn)
     if len(possible_moves)==0:
         if is_black_turn:
             return -WON_PRIZE
         else:
             return WON_PRIZE
+    return 0
+
+#count difference between the number of pieces, king+10
+def basic_ev_func(board, is_black_turn):
     h=0
+    won_prize = check_if_game_end(board, is_black_turn)
+    h += won_prize
     for row in range(BOARD_HEIGHT):
-        for col in range(BOARD_WIDTH):
+        for col in range((row+1)%2, BOARD_WIDTH, 2):
             piece = board.board[row][col]
             if piece.is_white():
                 if piece.is_king():
@@ -56,7 +61,38 @@ def basic_ev_func(board, is_black_turn):
 #nagrody jak w wersji podstawowej + nagroda za stopieĹ zwartoĹci grupy
 def group_prize_ev_func(board, is_black_turn):
     h=0
-    #ToDo
+    won_prize = check_if_game_end(board, is_black_turn)
+    h += won_prize
+    bonus = 4
+    for row in range(BOARD_HEIGHT):
+        for col in range((row+1)%2, BOARD_WIDTH, 2):
+            piece = board.board[row][col]
+            if piece.is_white():
+                h -= 1
+                if piece.is_king():
+                    h -= 10
+                for x in [-1,1]:
+                    for y in [-1,1]:
+                        new_row = row+y
+                        new_col = col+x
+                        if 0 <= new_row <= (BOARD_HEIGHT -1) and 0 <= new_col <= (BOARD_WIDTH-1):
+                            if board.board[new_row][new_col].is_white():
+                                h -= bonus
+                if col == 0 or row == 0 or row == (BOARD_HEIGHT - 1) or col == (BOARD_WIDTH - 1):
+                    h -= bonus
+            elif piece.is_black():
+                h += 1
+                if piece.is_king():
+                    h += 10
+                for x in [-1,1]:
+                    for y in [-1,1]:
+                        new_row = row+y
+                        new_col = col+x
+                        if 0 <= new_row <= (BOARD_HEIGHT -1) and 0 <= new_col <= (BOARD_WIDTH-1):
+                            if board.board[new_row][new_col].is_black():
+                                h += bonus
+                if col == 0 or row == 0 or row == (BOARD_HEIGHT- 1) or col == (BOARD_WIDTH - 1):
+                    h += bonus
     return h
 
 #za kaĹźdy pion na wĹasnej poĹowie planszy otrzymuje siÄ 5 nagrody, na poĹowie przeciwnika 7, a za kaĹźdÄ damkÄ 10.
@@ -85,15 +121,11 @@ def minimax_a_b(board, depth, plays_as_black, ev_func):
     moves_marks = []
     for possible_move in possible_moves:
         #ToDo
-        # Tworzymy kopię planszy przed wykonaniem ruchu
         new_board = deepcopy(board)
         new_board.make_move(possible_move)
-
-        # Wywołujemy funkcję rekurencyjną na skopiowanej planszy
         move_value = minimax_a_b_recurr(new_board, depth - 1,not plays_as_black, a, b, ev_func)
         moves_marks.append(move_value)
 
-        # Aktualizacja alfa i beta
         if plays_as_black:
             a = max(a, move_value)
         else:
@@ -110,7 +142,7 @@ def minimax_a_b_recurr(board, depth, move_max, a, b, ev_func):
     #ToDo
     possible_moves = board.get_possible_moves(move_max)
     if depth == 0 or len(possible_moves)==0:
-        return basic_ev_func(board, move_max)
+        return ev_func(board, move_max)
     if move_max:
         for move in possible_moves:
             new_board = deepcopy(board)
@@ -531,12 +563,15 @@ def ai_vs_ai():
 
     while is_running:
         if board.white_turn:
-            move = minimax_a_b( board, 5, not board.white_turn, basic_ev_func)
-        else:
-            move = minimax_a_b( board, 3, not board.white_turn, basic_ev_func)
+            move = minimax_a_b( board, 4, not board.white_turn, basic_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, push_forward_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, push_to_opp_half_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, group_prize_ev_func)
+        else:
+            move = minimax_a_b( board, 1, not board.white_turn, basic_ev_func)
+            #move = minimax_a_b( board, 5, not board.white_turn, push_forward_ev_func)
+            #move = minimax_a_b( board, 5, not board.white_turn, push_to_opp_half_ev_func)
+            #move = minimax_a_b( board, 2, not board.white_turn, group_prize_ev_func)
 
         if move is not None:
             board.register_move(move)
