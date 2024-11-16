@@ -33,23 +33,23 @@ KING_MARK_COL = (255, 215, 0)
 def basic_ev_func(board, is_black_turn):
     h=0
     if board.white_won:
-        return -WON_PRIZE if is_black_turn else WON_PRIZE
-    if board.black_won:
         return WON_PRIZE if is_black_turn else -WON_PRIZE
+    if board.black_won:
+        return -WON_PRIZE if is_black_turn else WON_PRIZE
 
     for row in range(BOARD_HEIGHT):
         for col in range(BOARD_WIDTH):
             piece = board.board[row][col]
             if piece.is_white():
                 if piece.is_king():
-                    h += 10
-                else:
-                    h += 1
-            elif piece.is_black():
-                if piece.is_king():
                     h -= 10
                 else:
                     h -= 1
+            elif piece.is_black():
+                if piece.is_king():
+                    h += 10
+                else:
+                    h += 1
     return h
 
 #nagrody jak w wersji podstawowej + nagroda za stopieĹ zwartoĹci grupy
@@ -98,6 +98,8 @@ def push_forward_ev_func(board, is_black_turn):
     return h
 
 #f. called from main
+#White - min player
+#Black - max player
 def minimax_a_b(board, depth, plays_as_black, ev_func):
     possible_moves = board.get_possible_moves(plays_as_black)
     if len(possible_moves)==0:
@@ -115,19 +117,19 @@ def minimax_a_b(board, depth, plays_as_black, ev_func):
         new_board.make_move(possible_move)
 
         # Wywołujemy funkcję rekurencyjną na skopiowanej planszy
-        move_value = minimax_a_b_recurr(new_board, depth - 1, plays_as_black, a, b, ev_func)
+        move_value = minimax_a_b_recurr(new_board, depth - 1,not plays_as_black, a, b, ev_func)
         moves_marks.append(move_value)
 
         # Aktualizacja alfa i beta
         if plays_as_black:
-            a = min(a, move_value)
+            a = max(a, move_value)
         else:
-            b = max(b, move_value)
+            b = min(b, move_value)
 
     if plays_as_black:
-        best_index = np.argmin(moves_marks)
-    else:
         best_index = np.argmax(moves_marks)
+    else:
+        best_index = np.argmin(moves_marks)
     return possible_moves[best_index]
 
 #recursive function, called from minimax_a_b
@@ -555,9 +557,9 @@ def ai_vs_ai():
 
     while is_running:
         if board.white_turn:
-            move = minimax_a_b( board, 5, not board.white_turn, basic_ev_func)
+            move = minimax_a_b( board, 4, not board.white_turn, basic_ev_func)
         else:
-            move = minimax_a_b( board, 5, not board.white_turn, basic_ev_func)
+            move = minimax_a_b( board, 1, not board.white_turn, basic_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, push_forward_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, push_to_opp_half_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, group_prize_ev_func)
