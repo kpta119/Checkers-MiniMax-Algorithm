@@ -42,20 +42,46 @@ def basic_ev_func(board, is_black_turn):
             piece = board.board[row][col]
             if piece.is_white():
                 if piece.is_king():
-                    h -= 10
-                else:
-                    h -= 1
-            elif piece.is_black():
-                if piece.is_king():
                     h += 10
                 else:
                     h += 1
+            elif piece.is_black():
+                if piece.is_king():
+                    h -= 10
+                else:
+                    h -= 1
     return h
 
 #nagrody jak w wersji podstawowej + nagroda za stopieĹ zwartoĹci grupy
 def group_prize_ev_func(board, is_black_turn):
     h=0
-#ToDo
+    # if board.white_won:
+    #     return -WON_PRIZE if is_black_turn else WON_PRIZE
+    # if board.black_won:
+    #     return WON_PRIZE if is_black_turn else -WON_PRIZE
+
+    # for row in range(BOARD_HEIGHT):
+    #     for col in range(BOARD_WIDTH):
+    #         piece = board.board[row][col]
+    #         if piece.is_white():
+    #             if piece.is_king():
+    #                 h += 10
+    #             else:
+    #                 h += 1
+    #         elif piece.is_black():
+    #             if piece.is_king():
+    #                 h -= 10
+    #             else:
+    #                 h -= 1
+    # changeCoordinates = [(1,1),(-1,-1),(1,-1),(-1,1)]
+    # for row in range(BOARD_HEIGHT):
+    #     for col in range(BOARD_WIDTH):
+    #         piece = board.board[row][col]
+    #         if piece.is_white():
+    #             for cor in changeCoordinates:
+    #                 piece2 = board.board[row+cor[0]][col+cor[1]]
+    #                 if piece2.is_white():
+    #                     h += 1
     return h
 
 #za kaĹźdy pion na wĹasnej poĹowie planszy otrzymuje siÄ 5 nagrody, na poĹowie przeciwnika 7, a za kaĹźdÄ damkÄ 10.
@@ -89,19 +115,19 @@ def minimax_a_b(board, depth, plays_as_black, ev_func):
         new_board.make_move(possible_move)
 
         # Wywołujemy funkcję rekurencyjną na skopiowanej planszy
-        move_value = minimax_a_b_recurr(new_board, depth - 1, not plays_as_black, a, b, ev_func)
+        move_value = minimax_a_b_recurr(new_board, depth - 1, plays_as_black, a, b, ev_func)
         moves_marks.append(move_value)
 
         # Aktualizacja alfa i beta
         if plays_as_black:
-            a = max(a, move_value)
+            a = min(a, move_value)
         else:
-            b = min(b, move_value)
+            b = max(b, move_value)
 
     if plays_as_black:
-        best_index = np.argmax(moves_marks)
-    else:
         best_index = np.argmin(moves_marks)
+    else:
+        best_index = np.argmax(moves_marks)
     return possible_moves[best_index]
 
 #recursive function, called from minimax_a_b
@@ -127,7 +153,7 @@ def minimax_a_b_recurr(board, depth, move_max, a, b, ev_func):
             b = min(b, eval)
             if b <= a:
                 return b
-    return b
+        return b
 
 
 class Move:
