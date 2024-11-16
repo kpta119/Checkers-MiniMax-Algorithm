@@ -31,11 +31,12 @@ KING_MARK_COL = (255, 215, 0)
 
 #count difference between the number of pieces, king+10
 def basic_ev_func(board, is_black_turn):
-    if board.white_won:
-        return -WON_PRIZE if is_black_turn else WON_PRIZE
-    if board.black_won:
-        return WON_PRIZE if is_black_turn else -WON_PRIZE
-
+    possible_moves = board.get_possible_moves(is_black_turn)
+    if len(possible_moves)==0:
+        if is_black_turn:
+            return -WON_PRIZE
+        else:
+            return WON_PRIZE
     h=0
     for row in range(BOARD_HEIGHT):
         for col in range(BOARD_WIDTH):
@@ -114,7 +115,7 @@ def minimax_a_b_recurr(board, depth, move_max, a, b, ev_func):
         for move in possible_moves:
             new_board = deepcopy(board)
             new_board.make_move(move)
-            eval = minimax_a_b_recurr(new_board, depth - 1, False, a, b, ev_func)
+            eval = minimax_a_b_recurr(new_board, depth - 1, not move_max, a, b, ev_func)
             a = max(a, eval)
             if b <= a:
                 return a
@@ -123,7 +124,7 @@ def minimax_a_b_recurr(board, depth, move_max, a, b, ev_func):
         for move in possible_moves:
             new_board = deepcopy(board)
             new_board.make_move(move)
-            eval = minimax_a_b_recurr(new_board, depth - 1, True, a, b, ev_func)
+            eval = minimax_a_b_recurr(new_board, depth - 1, not move_max, a, b, ev_func)
             b = min(b, eval)
             if b <= a:
                 return b
@@ -530,9 +531,9 @@ def ai_vs_ai():
 
     while is_running:
         if board.white_turn:
-            move = minimax_a_b( board, 2, not board.white_turn, basic_ev_func)
+            move = minimax_a_b( board, 5, not board.white_turn, basic_ev_func)
         else:
-            move = minimax_a_b( board, 1, not board.white_turn, basic_ev_func)
+            move = minimax_a_b( board, 3, not board.white_turn, basic_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, push_forward_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, push_to_opp_half_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, group_prize_ev_func)
