@@ -31,12 +31,12 @@ KING_MARK_COL = (255, 215, 0)
 
 #count difference between the number of pieces, king+10
 def basic_ev_func(board, is_black_turn):
-    h=0
     if board.white_won:
-        return WON_PRIZE if is_black_turn else -WON_PRIZE
-    if board.black_won:
         return -WON_PRIZE if is_black_turn else WON_PRIZE
+    if board.black_won:
+        return WON_PRIZE if is_black_turn else -WON_PRIZE
 
+    h=0
     for row in range(BOARD_HEIGHT):
         for col in range(BOARD_WIDTH):
             piece = board.board[row][col]
@@ -55,33 +55,7 @@ def basic_ev_func(board, is_black_turn):
 #nagrody jak w wersji podstawowej + nagroda za stopieĹ zwartoĹci grupy
 def group_prize_ev_func(board, is_black_turn):
     h=0
-    # if board.white_won:
-    #     return -WON_PRIZE if is_black_turn else WON_PRIZE
-    # if board.black_won:
-    #     return WON_PRIZE if is_black_turn else -WON_PRIZE
-
-    # for row in range(BOARD_HEIGHT):
-    #     for col in range(BOARD_WIDTH):
-    #         piece = board.board[row][col]
-    #         if piece.is_white():
-    #             if piece.is_king():
-    #                 h += 10
-    #             else:
-    #                 h += 1
-    #         elif piece.is_black():
-    #             if piece.is_king():
-    #                 h -= 10
-    #             else:
-    #                 h -= 1
-    # changeCoordinates = [(1,1),(-1,-1),(1,-1),(-1,1)]
-    # for row in range(BOARD_HEIGHT):
-    #     for col in range(BOARD_WIDTH):
-    #         piece = board.board[row][col]
-    #         if piece.is_white():
-    #             for cor in changeCoordinates:
-    #                 piece2 = board.board[row+cor[0]][col+cor[1]]
-    #                 if piece2.is_white():
-    #                     h += 1
+    #ToDo
     return h
 
 #za kaĹźdy pion na wĹasnej poĹowie planszy otrzymuje siÄ 5 nagrody, na poĹowie przeciwnika 7, a za kaĹźdÄ damkÄ 10.
@@ -98,8 +72,6 @@ def push_forward_ev_func(board, is_black_turn):
     return h
 
 #f. called from main
-#White - min player
-#Black - max player
 def minimax_a_b(board, depth, plays_as_black, ev_func):
     possible_moves = board.get_possible_moves(plays_as_black)
     if len(possible_moves)==0:
@@ -136,7 +108,7 @@ def minimax_a_b(board, depth, plays_as_black, ev_func):
 def minimax_a_b_recurr(board, depth, move_max, a, b, ev_func):
     #ToDo
     possible_moves = board.get_possible_moves(move_max)
-    if depth == 0 or len(possible_moves) == 0:
+    if depth == 0 or len(possible_moves)==0:
         return basic_ev_func(board, move_max)
     if move_max:
         for move in possible_moves:
@@ -378,6 +350,7 @@ class Board:
         #stop if repeats
         if self.black_repeats and self.white_repeats:
             #who won
+            print("Print end sie odpalił")
             ev=basic_ev_func(self, not self.white_turn)
             if ev>0:
                 self.black_won=True
@@ -557,7 +530,7 @@ def ai_vs_ai():
 
     while is_running:
         if board.white_turn:
-            move = minimax_a_b( board, 4, not board.white_turn, basic_ev_func)
+            move = minimax_a_b( board, 2, not board.white_turn, basic_ev_func)
         else:
             move = minimax_a_b( board, 1, not board.white_turn, basic_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, push_forward_ev_func)
@@ -580,5 +553,5 @@ def ai_vs_ai():
     #if both won then it is a draw!
 
 
-main()
-#ai_vs_ai()
+#main()
+ai_vs_ai()
