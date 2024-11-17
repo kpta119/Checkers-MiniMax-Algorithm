@@ -609,15 +609,15 @@ def ai_vs_ai():
 
     while is_running:
         if board.white_turn:
-            move = minimax_a_b( board, 4, not board.white_turn, basic_ev_func)
-            #move = minimax_a_b( board, 4, not board.white_turn, push_forward_ev_func)
-            #move = minimax_a_b( board, 4, not board.white_turn, push_to_opp_half_ev_func)
+            #move = minimax_a_b( board, 5, not board.white_turn, basic_ev_func)
+            #move = minimax_a_b( board, 5, not board.white_turn, push_forward_ev_func)
+            move = minimax_a_b( board, 5, not board.white_turn, push_to_opp_half_ev_func)
             #move = minimax_a_b( board, 5, not board.white_turn, group_prize_ev_func)
         else:
-            move = minimax_a_b( board, 2, not board.white_turn, basic_ev_func)
-            #move = minimax_a_b( board, 4, not board.white_turn, push_forward_ev_func)
-            #move = minimax_a_b( board, 4, not board.white_turn, push_to_opp_half_ev_func)
-            #move = minimax_a_b( board, 1, not board.white_turn, group_prize_ev_func)
+            #move = minimax_a_b( board, 5, not board.white_turn, basic_ev_func)
+            #move = minimax_a_b( board, 5, not board.white_turn, push_forward_ev_func)
+            move = minimax_a_b( board, 5, not board.white_turn, push_to_opp_half_ev_func)
+            #move = minimax_a_b( board, 5, not board.white_turn, group_prize_ev_func)
 
         if move is not None:
             board.register_move(move)
