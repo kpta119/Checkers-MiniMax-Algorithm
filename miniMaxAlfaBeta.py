@@ -619,5 +619,6 @@ def ai_vs_ai():
     #if both won then it is a draw!
 
 
-#main()
-ai_vs_ai()
+if __name__ == "__main__":
+    main()
+    #ai_vs_ai()
