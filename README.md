@@ -7,7 +7,7 @@ This project implements the **MiniMax algorithm with Alpha-Beta Pruning** for th
 - **Python**  
 - **Pygame**  
 - **NumPy**  
-- **MiniMax algorithm with Alpha-Beta pruning**  
+- **MiniMax algorithm with Alpha-Beta pruning** (implemented on my own)
 
 ## Features
 - Implementation of multiple evaluation functions:
